@@ -1,12 +1,12 @@
 import './App.css';
-import WhiteBoard from './components/WhiteBoard';
+import KonvaWhiteboard from './components/KonvaWhiteboard';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">Header </header>
-      <WhiteBoard />
-      <footer className="App-footer">Footer</footer>
+      {/* <header className="App-header">Header </header> */}
+      <KonvaWhiteboard />
+      {/* <footer className="App-footer">Footer</footer> */}
     </div>
   );
 }
