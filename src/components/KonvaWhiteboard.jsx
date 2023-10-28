@@ -1,20 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
 
-import { Stage, Layer, Line, Text } from 'react-konva';
+import { Stage, Layer, Line } from 'react-konva';
 import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
+
+import { downloadURI } from '../utils/FileUtils';
 
 function KonvaWhiteboard() {
 
     const [tool, setTool] = useState('pen');
     const [lines, setLines] = useState([]);
     const [lineHistory] = useState([]);
+    const [selectedColor, setSelectedColor] = useState('black');
+    const [backgroundColor, setBackgroundColor] = useState('white');
+    const [strokeWidth, setStrokeWidth] = useState(50);
+
     const isDrawing = React.useRef(false);
+    const stageRef = React.useRef(null);
 
     const handleMouseDown = (e) => {
         isDrawing.current = true;
         const pos = e.target.getStage().getPointerPosition();
-        setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+        setLines([...lines, { tool, points: [pos.x, pos.y], color: selectedColor, strokeWidth }]);
     };
 
 
@@ -22,6 +29,7 @@ function KonvaWhiteboard() {
         // no drawing - skipping
         if (!isDrawing.current) {
             return;
+
         }
         const stage = e.target.getStage();
         const point = stage.getPointerPosition();
@@ -47,40 +55,73 @@ function KonvaWhiteboard() {
     const handleRedo = () => {
         const newArray = [...lines];
         const getUndoItem = lineHistory.pop();
+        if (!getUndoItem) {
+            return;
+        }
         newArray.push(getUndoItem);
         setLines(newArray);
     };
 
-    useEffect(() => {
-        console.log(lines, 'undo function is currently empty')
-    }, [lines]);
+    const handleColorChange = (e) => {
+        setSelectedColor(e.target.value);
+    };
 
+    const handleExport = () => {
+        const uri = stageRef.current.toDataURL();
+        downloadURI(uri, 'stage.png');
+    };
 
     return (
         <div>
-            <div style={{ backgroundColor: 'pink' }}>
-                <Text onClick={handleUndo} >Undo</Text>
-                <Text onClick={handleRedo} >Redo</Text>
-                <BsFillPencilFill className={tool === 'pen' ? 'pen-cursor' : ''} onClick={(e) => setTool('pen')} />
-                <BsFillEraserFill className={tool === 'eraser' ? 'eraser-cursor' : ''} onClick={(e) => setTool('eraser')} />
+            <div style={{ backgroundColor: 'black', display: 'flex', gap: '20px', padding: '10px', justifyContent: 'center', flexDirection: 'row', height: 30, alignItems: 'center' }}>
+                <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}>Undo</Button>
+                <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}>Redo</Button>
+                <Button variant={tool === 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
+                <Button variant={tool === 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
+                <div style={{ color: 'white' }}>
+                    <span>Drawing Color: &nbsp;</span>
+                    <input
+                        type="color"
+                        value={selectedColor}
+                        onChange={handleColorChange}
+                    />
+                </div>
+                <div style={{ color: 'white' }}>
+                    <span>Background Color: &nbsp;</span>
+                    <input
+                        type="color"
+                        value={backgroundColor}
+                        onChange={(e) => setBackgroundColor(e.target.value)}
+                    />
+                </div>
+                <div style={{ color: 'white' }}>
+                    <span>Stroke Width: &nbsp;</span>
+                    <input
+                        type='number'
+                        value={strokeWidth}
+                        onChange={e => setStrokeWidth(e.target.value)}
+                    />
+                </div>
+                <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}>Export</Button>
             </div>
             <div>
                 <Stage
                     width={window.innerWidth}
-                    height={window.innerHeight * 0.5}
+                    height={window.innerHeight - 30}
                     onMouseDown={handleMouseDown}
                     onMousemove={handleMouseMove}
                     onMouseup={handleMouseUp}
-                    style={{ backgroundColor: 'skyBlue' }}
+                    style={{ backgroundColor: backgroundColor }}
+                    ref={stageRef}
                 >
                     <Layer>
                         {lines.map((line, i) => (
                             <Line
                                 key={i}
                                 points={line.points}
-                                stroke="#df4b26"
-                                strokeWidth={5}
-                                tension={0.5}
+                                stroke={line.color}
+                                strokeWidth={line.strokeWidth || 5}
+                                tension={0.2}
                                 lineCap="round"
                                 lineJoin="round"
                                 globalCompositeOperation={
@@ -94,5 +135,4 @@ function KonvaWhiteboard() {
         </div>
     );
 }
-
 export default KonvaWhiteboard;
