@@ -22,3 +22,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 - [ ] ability to classify images using a pre-trained model
 - [ ] authentication
 - [ ] allow multiple users to draw
+
+## Screenshot
+<img width="1440" alt="Screenshot 2023-10-28 at 1 51 50 PM" src="https://github.com/NiyatiGarg/Real-time-react-application/assets/119442591/f208a74a-4f98-474a-af68-0286892bf4c9">
