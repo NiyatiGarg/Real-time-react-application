@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { Stage, Layer, Line } from 'react-konva';
@@ -12,11 +12,11 @@ function KonvaWhiteboard() {
     const [lines, setLines] = useState([]);
     const [lineHistory] = useState([]);
     const [selectedColor, setSelectedColor] = useState('black');
-    const [backgroundColor, setBackgroundColor] = useState('white');
+    const [backgroundColor, setBackgroundColor] = useState('rgb(207, 205, 205)');
     const [strokeWidth, setStrokeWidth] = useState(50);
 
-    const isDrawing = React.useRef(false);
-    const stageRef = React.useRef(null);
+    const isDrawing = useRef(false);
+    const stageRef = useRef(null);
 
     const handleMouseDown = (e) => {
         isDrawing.current = true;
