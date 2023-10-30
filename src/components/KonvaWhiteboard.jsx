@@ -17,13 +17,18 @@ function KonvaWhiteboard() {
 
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
+    const nextLineId = useRef(0);
 
     const handleMouseDown = (e) => {
         isDrawing.current = true;
         const pos = e.target.getStage().getPointerPosition();
-        setLines([...lines, { tool, points: [pos.x, pos.y], color: selectedColor, strokeWidth }]);
+        setLines([...lines, {
+            id: nextLineId.current++,
+            tool,
+            points: [pos.x, pos.y],
+            color: selectedColor, strokeWidth
+        }]);
     };
-
 
     const handleMouseMove = (e) => {
         // no drawing - skipping
@@ -69,6 +74,29 @@ function KonvaWhiteboard() {
     const handleExport = () => {
         const uri = stageRef.current.toDataURL();
         downloadURI(uri, 'stage.png');
+    };
+
+    const handleDragStart = (e) => {
+        const id = e.target.id();
+        setLines((prevLines) =>
+            prevLines.map((line) => {
+                return {
+                    ...line,
+                    isDragging: line.id === id,
+                };
+            })
+        );
+    };
+    const handleDragEnd = (e) => {
+        const id = e.target.id();
+        setLines((prevLines) =>
+            prevLines.map((line) => {
+                return {
+                    ...line,
+                    isDragging: false,
+                };
+            })
+        );
     };
 
     return (
@@ -127,6 +155,13 @@ function KonvaWhiteboard() {
                                 globalCompositeOperation={
                                     line.tool === 'eraser' ? 'destination-out' : 'source-over'
                                 }
+                                shadowOffsetX={line.isDragging ? 10 : 5}
+                                shadowOffsetY={line.isDragging ? 10 : 5}
+                                scaleX={line.isDragging ? 1.2 : 1}
+                                scaleY={line.isDragging ? 1.2 : 1}
+                                draggable={true}
+                                onDragStart={handleDragStart}
+                                onDragEnd={handleDragEnd}
                             />
                         ))}
                     </Layer>
