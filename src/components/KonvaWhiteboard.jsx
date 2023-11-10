@@ -5,6 +5,7 @@ import { Stage, Layer, Line } from 'react-konva';
 import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
 
 import { downloadURI } from '../utils/FileUtils';
+import { getUser } from '../utils/KeycloakUtil';
 
 function KonvaWhiteboard() {
     const [lines, setLines] = useState([]);
@@ -37,8 +38,10 @@ function KonvaWhiteboard() {
         // no drawing - skipping
         if (!isDrawing.current) {
             return;
-
         }
+
+        console.log(getUser())
+
         const stage = e.target.getStage();
         const point = stage.getPointerPosition();
         let lastLine = lines[lines.length - 1];
