@@ -7,13 +7,15 @@ import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
 import { downloadURI } from '../utils/FileUtils';
 
 function KonvaWhiteboard() {
+    const [lines, setLines] = useState([]);
+    const [lineHistory, setLineHistory] = useState([]);
+    const [lineDragHistory, setLineDragHistory] = useState([]);
 
     const [tool, setTool] = useState('pen');
-    const [lines, setLines] = useState([]);
-    const [lineHistory] = useState([]);
-    const [selectedColor, setSelectedColor] = useState('black');
-    const [backgroundColor, setBackgroundColor] = useState('rgb(207, 205, 205)');
-    const [strokeWidth, setStrokeWidth] = useState(50);
+    const [selectedColor, setSelectedColor] = useState('#000000');
+    const [backgroundColor, setBackgroundColor] = useState('#CFCDCD');
+    const [strokeWidth, setStrokeWidth] = useState(20);
+
 
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
@@ -26,7 +28,8 @@ function KonvaWhiteboard() {
             id: nextLineId.current++,
             tool,
             points: [pos.x, pos.y],
-            color: selectedColor, strokeWidth
+            color: selectedColor,
+            strokeWidth
         }]);
     };
 
@@ -57,6 +60,7 @@ function KonvaWhiteboard() {
         lineHistory.push(getUndoItem);
         setLines(newArray);
     };
+
     const handleRedo = () => {
         const newArray = [...lines];
         const getUndoItem = lineHistory.pop();
@@ -66,6 +70,15 @@ function KonvaWhiteboard() {
         newArray.push(getUndoItem);
         setLines(newArray);
     };
+
+    const handleClear = () => {
+        if (window.confirm('Are you sure you want to clear the whiteboard')) {
+            stageRef.current.clear();
+            setLines([]);
+            setLineHistory([]);
+            setLineDragHistory([]);
+        }
+    }
 
     const handleColorChange = (e) => {
         setSelectedColor(e.target.value);
@@ -84,19 +97,32 @@ function KonvaWhiteboard() {
                     ...line,
                     isDragging: line.id === id,
                 };
-            })
+            }).filter((line, index) => index !== line.length - 1)
+        );
+
+    };
+
+    const handleDragMove = (e) => {
+        const id = e.target.id();
+        setLines((prevLines) =>
+            prevLines.map((line) => ({
+                ...line,
+                isDragging: line.id === id,
+            }))
         );
     };
+
     const handleDragEnd = (e) => {
         const id = e.target.id();
         setLines((prevLines) =>
-            prevLines.map((line) => {
-                return {
-                    ...line,
-                    isDragging: false,
-                };
-            })
+            prevLines.map((line) => ({
+                ...line,
+                isDragging: false,
+            }))
         );
+
+        const draggedLine = lines.find((line) => line.id === id);
+        setLineDragHistory([...lineDragHistory, draggedLine]);
     };
 
     return (
@@ -104,6 +130,7 @@ function KonvaWhiteboard() {
             <div style={{ backgroundColor: 'black', display: 'flex', gap: '20px', padding: '10px', justifyContent: 'center', flexDirection: 'row', height: 30, alignItems: 'center' }}>
                 <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}>Undo</Button>
                 <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}>Redo</Button>
+                <Button variant="primary" onClick={handleClear} disabled={lines.length < 1}>Clear</Button>
                 <Button variant={tool === 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
                 <Button variant={tool === 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
                 <div style={{ color: 'white' }}>
@@ -144,6 +171,7 @@ function KonvaWhiteboard() {
                 >
                     <Layer>
                         {lines.map((line, i) => (
+
                             <Line
                                 key={i}
                                 points={line.points}
@@ -155,12 +183,9 @@ function KonvaWhiteboard() {
                                 globalCompositeOperation={
                                     line.tool === 'eraser' ? 'destination-out' : 'source-over'
                                 }
-                                shadowOffsetX={line.isDragging ? 10 : 5}
-                                shadowOffsetY={line.isDragging ? 10 : 5}
-                                scaleX={line.isDragging ? 1.2 : 1}
-                                scaleY={line.isDragging ? 1.2 : 1}
-                                draggable={true}
+                                draggable={line.tool !== 'eraser'}
                                 onDragStart={handleDragStart}
+                                onDragMove={handleDragMove}
                                 onDragEnd={handleDragEnd}
                             />
                         ))}
