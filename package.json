@@ -7,8 +7,10 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.2",
+    "firebase": "^10.6.0",
     "keycloak-js": "^22.0.5",
     "konva": "^9.2.2",
+    "randomatic": "^3.1.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-color-palette": "^7.1.0",
@@ -22,7 +24,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "init-keycloak": "docker run -p 8080:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5 start-dev"
   },
   "eslintConfig": {
     "extends": [

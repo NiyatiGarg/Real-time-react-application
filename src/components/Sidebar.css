@@ -1,0 +1,12 @@
+.container {
+    min-width: 300px !important;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+    color: wheat !important;
+}
+
+.buttons {
+    display: flex;
+}

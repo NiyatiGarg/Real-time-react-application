@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 
 import { Stage, Layer, Line } from 'react-konva';
@@ -6,9 +6,9 @@ import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
 
 import { downloadURI } from '../utils/FileUtils';
 import { getUser } from '../utils/KeycloakUtil';
+import StorageUtils from '../utils/StorageUtils';
 
-function KonvaWhiteboard() {
-    const [lines, setLines] = useState([]);
+function KonvaWhiteboard({ lines, setLines }) {
     const [lineHistory, setLineHistory] = useState([]);
     const [lineDragHistory, setLineDragHistory] = useState([]);
 
@@ -17,10 +17,13 @@ function KonvaWhiteboard() {
     const [backgroundColor, setBackgroundColor] = useState('#CFCDCD');
     const [strokeWidth, setStrokeWidth] = useState(20);
 
-
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
     const nextLineId = useRef(0);
+
+    useEffect(() => {
+        StorageUtils.updateLines(lines);
+    }, [lines])
 
     const handleMouseDown = (e) => {
         isDrawing.current = true;
@@ -35,15 +38,16 @@ function KonvaWhiteboard() {
     };
 
     const handleMouseMove = (e) => {
+        const stage = e.target.getStage();
+        const point = stage.getPointerPosition();
+
+        StorageUtils.updatePointer(point.x, point.y)
+
         // no drawing - skipping
         if (!isDrawing.current) {
             return;
         }
 
-        console.log(getUser())
-
-        const stage = e.target.getStage();
-        const point = stage.getPointerPosition();
         let lastLine = lines[lines.length - 1];
         // add point
         lastLine.points = lastLine.points.concat([point.x, point.y]);
