@@ -10,8 +10,7 @@ const Sidebar = ({ users = [], exitRoom }) => {
     const [username, setUsername] = useState('');
 
     const inviteUser = async () => {
-        const done  = await StorageUtils.invite(username);
-        console.log(done);
+        await StorageUtils.invite(username).then(() => alert('User invited: '+ username)).catch((e) => alert(e));
     }
 
     return (

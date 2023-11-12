@@ -6,6 +6,7 @@
     gap: 10px;
     color: white !important;
     height: 100vh;
+    border-right: 1px solid white;
 }
 
 .usersContainer {

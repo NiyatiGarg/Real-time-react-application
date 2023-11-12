@@ -3,19 +3,18 @@ import { Button } from 'react-bootstrap';
 
 import { Stage, Layer, Line } from 'react-konva';
 import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
-
+import Cursors from './Cursors';
 import { downloadURI } from '../utils/FileUtils';
-import { getUser } from '../utils/KeycloakUtil';
 import StorageUtils from '../utils/StorageUtils';
 
-function KonvaWhiteboard({ lines, setLines }) {
+function KonvaWhiteboard({ lines, setLines, users }) {
     const [lineHistory, setLineHistory] = useState([]);
     const [lineDragHistory, setLineDragHistory] = useState([]);
 
     const [tool, setTool] = useState('pen');
     const [selectedColor, setSelectedColor] = useState('#000000');
-    const [backgroundColor, setBackgroundColor] = useState('#CFCDCD');
-    const [strokeWidth, setStrokeWidth] = useState(20);
+    const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+    const [strokeWidth, setStrokeWidth] = useState(2);
 
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
@@ -134,7 +133,7 @@ function KonvaWhiteboard({ lines, setLines }) {
 
     return (
         <div>
-            <div style={{ backgroundColor: 'black', display: 'flex', gap: '20px', padding: '10px', justifyContent: 'center', flexDirection: 'row', height: 30, alignItems: 'center' }}>
+            <div style={{ backgroundColor: 'black', display: 'flex', gap: '20px', padding: '10px', justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
                 <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}>Undo</Button>
                 <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}>Redo</Button>
                 <Button variant="primary" onClick={handleClear} disabled={lines.length < 1}>Clear</Button>
@@ -166,7 +165,7 @@ function KonvaWhiteboard({ lines, setLines }) {
                 </div>
                 <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}>Export</Button>
             </div>
-            <div>
+            <div style={{position: 'relative'}}>
                 <Stage
                     width={window.innerWidth}
                     height={window.innerHeight - 30}
@@ -198,6 +197,7 @@ function KonvaWhiteboard({ lines, setLines }) {
                         ))}
                     </Layer>
                 </Stage>
+                <Cursors users={users} />
             </div>
         </div>
     );

@@ -40,7 +40,7 @@ const App = () => {
     ? (
       <div className="playzone">
         <Sidebar users={Object.keys(users)} exitRoom={() => setIsJoined(false)} />
-        {isLoading ? null : <KonvaWhiteboard lines={lines} setLines={setLines} />}
+        {isLoading ? null : <KonvaWhiteboard lines={lines} setLines={setLines} users={users}/>}
       </div>
     ) : (
       <form className="container" onSubmit={join}>

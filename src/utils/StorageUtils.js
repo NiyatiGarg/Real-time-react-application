@@ -23,10 +23,14 @@ export default class StorageUtils {
 
     static init = async () => {
         await initializeApp(firebaseConfig);
+
         this.saveUser(getUsername(), await getName());
     }
 
     static saveUser = (username, name) => {
+        if (!username) {
+            return;
+        }
         const db = getDatabase();
         const dbRef = ref(db);
         get(child(dbRef, `users/${username}`)).then((snapshot) => {
@@ -46,6 +50,9 @@ export default class StorageUtils {
     }
 
     static updatePointer = (x, y) => {
+        if (!this.whiteboardId || !this.username) {
+            return;
+        }
         const updates = {};
         updates[`whiteboards/${this.whiteboardId}/users/${this.username}/x`] = x;
         updates[`whiteboards/${this.whiteboardId}/users/${this.username}/y`] = y;
@@ -54,8 +61,11 @@ export default class StorageUtils {
     }
 
     static updateLines = (lines) => {
+        if (!this.whiteboardId) {
+            return;
+        }
         const updates = {};
-        updates[`whiteboards/${this.whiteboardId}/lines`] = lines;
+        updates[`whiteboards/${this.whiteboardId}/lines`] = lines.length === 0 ? null : lines;
         const db = getDatabase();
         update(ref(db), updates);
     }
