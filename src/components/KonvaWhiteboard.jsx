@@ -97,7 +97,6 @@ function KonvaWhiteboard({ lines, setLines, users }) {
 
     const handleClear = () => {
         if (window.confirm('Are you sure you want to clear the whiteboard')) {
-            StorageUtils.clear();
             stageRef.current.clear();
             setLines([]);
             setLineHistory([]);
@@ -174,8 +173,8 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                 <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}><ImUndo2 /></Button>
                 <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}><ImRedo2 /></Button>
                 <Button variant="primary" onClick={handleClear} disabled={lines.length < 1}>Clear</Button>
-                <Button variant={tool === 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
-                <Button variant={tool === 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
+                <Button variant={tool !== 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
+                <Button variant={tool !== 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
                 <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}><FaFileDownload /></Button>
                 <Form.Control
                     type="file"
@@ -189,7 +188,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                     onChange={handleColorChange}
                 />
                 <span className='item'>
-                    Background
+                    Background:
                     <Form.Control
                         type="color"
                         value={backgroundColor}
@@ -197,7 +196,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                     />
                 </span>
                 <span className='item'>
-                    Width
+                    Width:
                     <Form.Control
                         style={{ width: '75px' }}
                         type='number'
