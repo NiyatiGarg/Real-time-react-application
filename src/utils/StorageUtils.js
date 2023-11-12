@@ -161,9 +161,9 @@ export default class StorageUtils {
         update(ref(db), updates);
     }
 
-    static invite(username) {
+    static async invite(username) {
         const db = getDatabase();
-        set(ref(db, `whiteboards/${this.whiteboardId}/users/${username}`), { x: 100, y: 200 });
+        return set(ref(db, `whiteboards/${this.whiteboardId}/users/${username}`), { x: 100, y: 200 });
     }
 
     static canJoin(users) {

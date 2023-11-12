@@ -1,5 +1,8 @@
 import { getUsername } from "../utils/KeycloakUtil";
 import StorageUtils from "../utils/StorageUtils";
+import {Button} from 'react-bootstrap';
+import {ImCross} from 'react-icons/im';
+import './UserItem.css';
 
 const UserItem = ({ user }) => {
     const removeUser = (e) => {
@@ -11,10 +14,16 @@ const UserItem = ({ user }) => {
     const canRemove = StorageUtils.owner !== user?.username && user?.username !== getUsername();
 
     return (
-        <div className="container">
-            <p>{user?.name || user?.username}</p>
+        <div className="userItem">
+            <span>{user?.name || user?.username}</span>
             {
-                canRemove && <button onClick={removeUser}>X</button>
+                user?.username === StorageUtils.username && <span>(You)</span>
+            }
+            {
+                user?.username === StorageUtils.owner && <span>(Admin)</span>
+            }
+            {
+                canRemove && <ImCross onClick={removeUser} />
             }
         </div>
     )

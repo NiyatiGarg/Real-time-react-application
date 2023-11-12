@@ -39,7 +39,7 @@ const App = () => {
   return isJoined
     ? (
       <div className="playzone">
-        <Sidebar users={Object.keys(users)} />
+        <Sidebar users={Object.keys(users)} exitRoom={() => setIsJoined(false)} />
         {isLoading ? null : <KonvaWhiteboard lines={lines} setLines={setLines} />}
       </div>
     ) : (

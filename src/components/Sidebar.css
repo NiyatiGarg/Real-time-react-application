@@ -1,12 +1,23 @@
-.container {
-    min-width: 300px !important;
+.sidebarContainer {
+    min-width: 200px !important;
     display: flex;
     flex-direction: column;
     padding: 10px;
     gap: 10px;
-    color: wheat !important;
+    color: white !important;
+    height: 100vh;
 }
 
-.buttons {
+.usersContainer {
+    flex: 1;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.invite {
     display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    align-items: center;
 }
