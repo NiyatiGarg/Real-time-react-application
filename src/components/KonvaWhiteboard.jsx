@@ -1,15 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 
 import { Stage, Layer, Line } from 'react-konva';
 import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
+import { ImUndo2, ImRedo2 } from 'react-icons/im';
+import { FaFileDownload } from 'react-icons/fa';
 import Cursors from './Cursors';
 import { downloadURI } from '../utils/FileUtils';
 import StorageUtils from '../utils/StorageUtils';
+import './KonvaWhiteboard.css';
+import { useLayoutEffect } from 'react';
 
 function KonvaWhiteboard({ lines, setLines, users }) {
     const [lineHistory, setLineHistory] = useState([]);
     const [lineDragHistory, setLineDragHistory] = useState([]);
+    const [width, setWidth] = useState(800);
+    const [height, setHeight] = useState(600);
 
     const [tool, setTool] = useState('pen');
     const [selectedColor, setSelectedColor] = useState('#000000');
@@ -19,6 +25,17 @@ function KonvaWhiteboard({ lines, setLines, users }) {
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
     const nextLineId = useRef(0);
+
+    useLayoutEffect(() => {
+        const _width = document.getElementById('whiteboard').offsetWidth;
+        const _height = document.getElementById('whiteboard').offsetHeight;
+        if (width !== _width) {
+            setWidth(_width);
+        }
+        if (height !== _height) {
+            setWidth(_height);
+        }
+    })
 
     useEffect(() => {
         StorageUtils.updateLines(lines);
@@ -132,47 +149,45 @@ function KonvaWhiteboard({ lines, setLines, users }) {
     };
 
     return (
-        <div>
-            <div style={{ backgroundColor: 'black', display: 'flex', gap: '20px', padding: '10px', justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
-                <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}>Undo</Button>
-                <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}>Redo</Button>
+        <div className='appContainer'>
+            <div className="controlBar">
+                <Button variant="primary" onClick={handleUndo} disabled={lines.length < 1}><ImUndo2 /></Button>
+                <Button variant="primary" onClick={handleRedo} disabled={lineHistory.length < 1}><ImRedo2 /></Button>
                 <Button variant="primary" onClick={handleClear} disabled={lines.length < 1}>Clear</Button>
                 <Button variant={tool === 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
                 <Button variant={tool === 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
-                <div style={{ color: 'white' }}>
-                    <span>Drawing Color: &nbsp;</span>
-                    <input
-                        type="color"
-                        value={selectedColor}
-                        onChange={handleColorChange}
-                    />
-                </div>
-                <div style={{ color: 'white' }}>
-                    <span>Background Color: &nbsp;</span>
-                    <input
+                <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}><FaFileDownload /></Button>
+                <Form.Control
+                    type="color"
+                    value={selectedColor}
+                    onChange={handleColorChange}
+                />
+                <span className='item'>
+                    Background
+                    <Form.Control
                         type="color"
                         value={backgroundColor}
                         onChange={(e) => setBackgroundColor(e.target.value)}
                     />
-                </div>
-                <div style={{ color: 'white' }}>
-                    <span>Stroke Width: &nbsp;</span>
-                    <input
+                </span>
+                <span className='item'>
+                    Width
+                    <Form.Control
+                        style={{ color: 'white', width: '75px' }}
                         type='number'
                         value={strokeWidth}
                         onChange={e => setStrokeWidth(e.target.value)}
                     />
-                </div>
-                <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}>Export</Button>
+                </span>
             </div>
-            <div style={{position: 'relative'}}>
+            <div id='whiteboard' style={{ position: 'relative', flex: 1 }}>
                 <Stage
-                    width={window.innerWidth}
-                    height={window.innerHeight - 30}
+                    width={document.getElementById('whiteboard')?.offsetWidth}
+                    height={document.getElementById('whiteboard')?.offsetHeight}
                     onMouseDown={handleMouseDown}
                     onMousemove={handleMouseMove}
                     onMouseup={handleMouseUp}
-                    style={{ backgroundColor: backgroundColor }}
+                    style={{ backgroundColor: backgroundColor, height: '100%' }}
                     ref={stageRef}
                 >
                     <Layer>
