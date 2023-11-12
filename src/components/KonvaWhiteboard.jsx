@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
-import { Stage, Layer, Line } from 'react-konva';
+import { Stage, Layer, Line, Image } from 'react-konva';
 import { BsFillPencilFill, BsFillEraserFill } from 'react-icons/bs';
 import { ImUndo2, ImRedo2 } from 'react-icons/im';
 import { FaFileDownload } from 'react-icons/fa';
@@ -10,6 +10,7 @@ import { downloadURI } from '../utils/FileUtils';
 import StorageUtils from '../utils/StorageUtils';
 import './KonvaWhiteboard.css';
 import { useLayoutEffect } from 'react';
+import ImageLayer from './ImageLayer';
 
 function KonvaWhiteboard({ lines, setLines, users }) {
     const [lineHistory, setLineHistory] = useState([]);
@@ -21,10 +22,10 @@ function KonvaWhiteboard({ lines, setLines, users }) {
     const [selectedColor, setSelectedColor] = useState('#000000');
     const [backgroundColor, setBackgroundColor] = useState('#ffffff');
     const [strokeWidth, setStrokeWidth] = useState(2);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const isDrawing = useRef(false);
     const stageRef = useRef(null);
-    const nextLineId = useRef(0);
 
     useLayoutEffect(() => {
         const _width = document.getElementById('whiteboard').offsetWidth;
@@ -45,7 +46,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
         isDrawing.current = true;
         const pos = e.target.getStage().getPointerPosition();
         setLines([...lines, {
-            id: nextLineId.current++,
+            id: lines.length,
             tool,
             points: [pos.x, pos.y],
             color: selectedColor,
@@ -96,6 +97,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
 
     const handleClear = () => {
         if (window.confirm('Are you sure you want to clear the whiteboard')) {
+            StorageUtils.clear();
             stageRef.current.clear();
             setLines([]);
             setLineHistory([]);
@@ -104,6 +106,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
     }
 
     const handleColorChange = (e) => {
+        console.log(e.target.value)
         setSelectedColor(e.target.value);
     };
 
@@ -148,6 +151,23 @@ function KonvaWhiteboard({ lines, setLines, users }) {
         setLineDragHistory([...lineDragHistory, draggedLine]);
     };
 
+    const addImageLayer = (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            return;
+        }
+        const imageUrl = URL.createObjectURL(event.target.files[0]);
+        setLines([...lines, {
+            id: lines.length,
+            tool: 'image',
+            imageUrl: imageUrl,
+            width: 200,
+            height: 200,
+            x: 0,
+            y: 0,
+        }]);
+    }
+
     return (
         <div className='appContainer'>
             <div className="controlBar">
@@ -157,6 +177,12 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                 <Button variant={tool === 'pen' ? 'primary' : 'light'} onClick={(e) => setTool('pen')}><BsFillPencilFill /></Button>
                 <Button variant={tool === 'eraser' ? 'primary' : 'light'} onClick={(e) => setTool('eraser')}><BsFillEraserFill /></Button>
                 <Button variant="primary" onClick={handleExport} disabled={lines.length < 1}><FaFileDownload /></Button>
+                <Form.Control
+                    type="file"
+                    name="myImage"
+                    style={{ width: '75px' }}
+                    onChange={addImageLayer}
+                />
                 <Form.Control
                     type="color"
                     value={selectedColor}
@@ -173,7 +199,7 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                 <span className='item'>
                     Width
                     <Form.Control
-                        style={{ color: 'white', width: '75px' }}
+                        style={{ width: '75px' }}
                         type='number'
                         value={strokeWidth}
                         onChange={e => setStrokeWidth(e.target.value)}
@@ -192,23 +218,36 @@ function KonvaWhiteboard({ lines, setLines, users }) {
                 >
                     <Layer>
                         {lines.map((line, i) => (
-
-                            <Line
-                                key={i}
-                                points={line.points}
-                                stroke={line.color}
-                                strokeWidth={line.strokeWidth || 5}
-                                tension={0.2}
-                                lineCap="round"
-                                lineJoin="round"
-                                globalCompositeOperation={
-                                    line.tool === 'eraser' ? 'destination-out' : 'source-over'
-                                }
-                                draggable={line.tool !== 'eraser'}
-                                onDragStart={handleDragStart}
-                                onDragMove={handleDragMove}
-                                onDragEnd={handleDragEnd}
-                            />
+                            line.tool === 'image' ? (
+                                <ImageLayer
+                                    key={i}
+                                    imageUrl={line.imageUrl}
+                                    height={line.height}
+                                    width={line.width}
+                                    x={line.x}
+                                    y={line.y}
+                                    onDragStart={handleDragStart}
+                                    onDragMove={handleDragMove}
+                                    onDragEnd={handleDragEnd}
+                                />
+                            ) : (
+                                <Line
+                                    key={i}
+                                    points={line.points}
+                                    stroke={line.color}
+                                    strokeWidth={line.strokeWidth || 5}
+                                    tension={0.2}
+                                    lineCap="round"
+                                    lineJoin="round"
+                                    globalCompositeOperation={
+                                        line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                                    }
+                                    draggable={line.tool !== 'eraser'}
+                                    onDragStart={handleDragStart}
+                                    onDragMove={handleDragMove}
+                                    onDragEnd={handleDragEnd}
+                                />
+                            )
                         ))}
                     </Layer>
                 </Stage>
