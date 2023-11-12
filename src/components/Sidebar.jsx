@@ -4,6 +4,7 @@ import UserItem from './UserItem';
 import './Sidebar.css';
 import { Form, Button } from 'react-bootstrap';
 import {BsBoxArrowRight} from 'react-icons/bs';
+import Colors from '../constants/Colors';
 import { useState } from 'react';
 
 const Sidebar = ({ users = [], exitRoom }) => {
@@ -19,7 +20,7 @@ const Sidebar = ({ users = [], exitRoom }) => {
             <div className='usersContainer'>
             <h3>Users</h3>
             {
-                users.map(user => <UserItem key={user} user={StorageUtils.users[user]} />)
+                users.map((user, index) => <UserItem key={user} user={StorageUtils.users[user]} color={Colors[index]}/>)
             }
             </div>
             <div className="invite">

@@ -4,7 +4,7 @@ import {Button} from 'react-bootstrap';
 import {ImCross} from 'react-icons/im';
 import './UserItem.css';
 
-const UserItem = ({ user }) => {
+const UserItem = ({ user, color }) => {
     const removeUser = (e) => {
         if (window.confirm('Are you sure you want to remove this user')) {
             StorageUtils.removeUser(user?.username);
@@ -15,7 +15,7 @@ const UserItem = ({ user }) => {
 
     return (
         <div className="userItem">
-            <span>{user?.name || user?.username}</span>
+            <span style={{color}}>{user?.name || user?.username}</span>
             {
                 user?.username === StorageUtils.username && <span>(You)</span>
             }
