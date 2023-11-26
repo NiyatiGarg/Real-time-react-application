@@ -3,8 +3,8 @@
 * Keycloak for authentication
 * React.js
 * react-konva for drawing
-* css & react-bootstrap for UI styling
-* yarn as package manager
+* CSS & react-bootstrap for UI styling
+* yarn as a package manager
 
 ## Available Scripts
 
@@ -24,7 +24,7 @@ To start the project, in the project directory, you can run:
 #### ```npm start```
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## progress
+## features covered
 - [x] live whiteboard session
 - [x] ability to draw
 - [x] ability to change color
@@ -41,10 +41,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 - [x] Track user cursor in realtime
 - [x] ability to change the whiteboard room
 - [x] Beautiful UI
-
-#### What's left
-* Ability to classify images using a pre-trained model
-* some little bugs in functionality
 
 ## Recording
 https://github.com/NiyatiGarg/Real-time-react-application/assets/119442591/b4756a4f-282e-4cb0-be07-01915d21dd7d
